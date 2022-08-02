@@ -1,0 +1,13 @@
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - ${ASFDB_SERVER_PORT:-27017}:27017
+    environment:
+      - MONGO_INITDB_DATABASE=registration
+    volumes:
+      - ./docker-volumes/initdb/:/docker-entrypoint-initdb.d/:ro
+      - mongodb-data:/data/db
+    restart: unless-stopped
+volumes:
+  mongodb-data:

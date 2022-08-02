@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "description": "Information about the temperature setting.",
+  "properties": {
+    "fridgeId": {
+      "type": "string",
+      "description": "ID of the fridge appliance."
+    },
+    "temperature": {
+      "type": "number",
+      "description": "Temperature setting."
+    },
+    "sentAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time when the message was sent."
+    }
+  },
+  "required": [
+    "fridgeId",
+    "temperature",
+    "sentAt"
+  ]
+}

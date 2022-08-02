@@ -1,0 +1,8 @@
+database:
+  host: "localhost"
+  port: "27017"
+mqtt:
+  listener:
+    host: "tcp://mr1n34cqfgy8kj.messaging.solace.cloud:1883"
+    username: "uivSJPMJNaKa78kHyE14A0XRG0LtECpz"
+    password: "sEQWJZaKujtDmT5i"

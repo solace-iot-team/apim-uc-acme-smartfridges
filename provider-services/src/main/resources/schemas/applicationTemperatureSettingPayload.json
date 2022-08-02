@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "description": "Information about the temperature setting.",
+  "properties": {
+    "customerId": {
+      "type": "number",
+      "description": "ID of the customer."
+    },
+    "fridgeId": {
+      "type": "string",
+      "description": "ID of the fridge."
+    },
+    "temperature": {
+      "type": "number",
+      "description": "Temperature setting."
+    },
+    "sentAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time when the message was sent."
+    }
+  },
+  "required": [
+    "customerId",
+    "fridgeId",
+    "temperature",
+    "sentAt"
+  ]
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "name": "John's Fridge",
+    "description": "Personal fridge of John",
+    "temperatureSetting": 4,
+    "doorStatus": "closed",
+    "id": "c7c37a2b-e888-446a-940a-8b848b72a150"
+  },
+  {
+    "name": "Anna's Fridge #1",
+    "description": "Personal fridge of Anna, located in the kitchen",
+    "temperatureSetting": 4,
+    "doorStatus": "closed",
+    "id": "50b8c52f-73b9-4cd3-9a2d-cadb4c24cb9f"
+  },
+  {
+    "name": "Anna's Fridge #2",
+    "description": "Personal fridge of Anna, located in the storage room",
+    "temperatureSetting": 5,
+    "doorStatus": "closed",
+    "id": "1336c855-7d67-4615-aa6d-5a372f8cc755"
+  },
+  {
+    "name": "Peter's Fridge",
+    "description": "Personal fridge of Peter (unregistered)",
+    "temperatureSetting": 2,
+    "doorStatus": "closed",
+    "id": "7f3051f4-1cfe-48ac-ac70-f78081e90c33"
+  }
+]

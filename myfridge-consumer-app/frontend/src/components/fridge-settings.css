@@ -1,0 +1,11 @@
+.fridge-settings {
+  background-color: var(--surface-ground);
+  border: 1px solid var(--surface-border);
+  width: 25rem;
+  padding: 2rem 1.5rem;
+  border-radius: 10px;
+}
+
+.fridge-settings label {
+  font-family: var(--font-family);
+}

@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "description": "Information about the measured temperature.",
+  "properties": {
+    "fridgeId": {
+      "type": "string",
+      "description": "ID of the fridge appliance."
+    },
+    "temperature": {
+      "type": "object",
+      "description": "Temperature information.",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Temperature value."
+        },
+        "unit": {
+          "type": "string",
+          "enum": [
+            "C",
+            "F"
+          ],
+          "description": "Temperature unit (Celsius or Fahrenheit)."
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit"
+      ]
+    },
+    "sentAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time when the message was sent."
+    }
+  },
+  "required": [
+    "fridgeId",
+    "temperature",
+    "sentAt"
+  ]
+}

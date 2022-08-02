@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+	<sub-flow name="parse-and-validate-payload" doc:id="1510ffc5-3ba8-4e1a-aebd-3589270a7a75">
+	    <set-payload value='#[output application/json&#10;---&#10;read(payload, "application/json")]' doc:name="Parse Payload" doc:id="117c087e-cb81-482e-a5cf-0c3f752e4614" mimeType="application/json" />
+		<logger level="DEBUG" doc:name="Log Payload" doc:id="59da5156-ca63-45aa-8a2d-99fbdfd18304" message="#[payload]" category="acme.smartfridges.utils"/>
+		<json:validate-schema doc:name="Validate Payload" doc:id="27346223-a4f7-4175-8867-7107e7677eb7" schema="#[vars.schema]" >
+			<error-mapping sourceType="JSON:SCHEMA_NOT_HONOURED" targetType="APP:INVALID_MESSAGE" />
+		</json:validate-schema>
+	</sub-flow>
+	<sub-flow name="check-registration-for-appliance-topic" doc:id="7efc71c5-69e5-45d5-97b8-53141047f208" >
+		<set-variable value='#[(attributes.topic splitBy("/"))[5]]' doc:name="Set fridge ID" doc:id="96b9d848-3cf4-46a7-ac3e-b88cffc032b3" variableName="fridgeId"/>
+		<mongo:find-documents collectionName="fridges" fields="fridgeId, customerId" doc:name="Find customer" doc:id="0cbdb8e3-5c04-4975-9e4b-01533ccd6986" config-ref="Registration_Database_Connection" target="customer" targetValue="#[payload[0]]">
+			<reconnect />
+			<mongo:query ><![CDATA[#[output application/json
+---
+{ fridgeId: vars.fridgeId }]]]></mongo:query>
+		</mongo:find-documents>
+		<choice doc:name="Check customer" doc:id="c2e85f02-6946-41e1-9b20-c8a903d83b59" >
+			<when expression="#[output application/java&#10;---&#10;vars.customer is Null]">
+				<logger level="DEBUG" doc:name="Log Result" doc:id="82359892-8b62-48a7-a06e-dd5cea6ef967" message="Fridge '#[vars.fridgeId]' is not registered." category="acme.smartfridges.utils" />
+				<raise-error doc:name="Raise error" doc:id="f6345ed1-13c0-4788-bcf3-b18f8ce8be8a" type="APP:FRIDGE_NOT_REGISTERED" description="No customer is registered for fridge." />
+		
+			</when>
+			<otherwise >
+				<logger level="DEBUG" doc:name="Log Result" doc:id="d3dcb8a5-d7e5-437f-bd31-e115717b17fa" message="Fridge '#[vars.fridgeId]' is registered for customer '#[vars.customer]'." category="acme.smartfridges.utils" />
+				<set-variable value="#[floor(vars.customer.customerId)]" doc:name="Set customer ID" doc:id="144365c1-ce42-4bc2-9990-f499c5058500" variableName="customerId" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="check-registration-for-application-topic" doc:id="2b381402-c5b3-4154-83ef-2d6a49dcc564">
+		<set-variable value='#[(attributes.topic splitBy("/"))[5] as Number]' doc:name="Set customer ID" doc:id="caf6fbdd-fa3e-49be-9b25-afe43cafabbf" variableName="customerId"/>
+		<set-variable value='#[(attributes.topic splitBy("/"))[6]]' doc:name="Set fridge ID" doc:id="9867ce0e-a19a-4982-85c7-98d7c221398e" variableName="fridgeId"/>
+		<mongo:find-documents collectionName="fridges" fields="fridgeId, customerId" doc:name="Find customer" doc:id="47893897-fc3e-4cbe-842c-56f95d92f6f5" config-ref="Registration_Database_Connection" target="customer" targetValue="#[payload[0]]">
+			<reconnect />
+			<mongo:query ><![CDATA[#[output application/json
+---
+{ fridgeId: vars.fridgeId }]]]></mongo:query>
+		</mongo:find-documents>
+		<choice doc:name="Check customer" doc:id="b8bf32a0-c20c-49e6-aeaa-9f586ae5c2ae" >
+			<when expression="#[output application/java&#10;---&#10;vars.customer is Null]">
+				<logger level="DEBUG" doc:name="Log Result" doc:id="b2d887e8-6cf1-40df-ab7e-bee64f60f825" message="Fridge '#[vars.fridgeId]' is not registered." category="acme.smartfridges.utils" />
+				<raise-error doc:name="Raise error" doc:id="49149d1c-9307-46c6-873b-1dea1a73177a" type="APP:FRIDGE_NOT_REGISTERED" description="Fridge is not registered." />
+		
+			</when>
+			<when expression="#[output application/java&#10;---&#10;vars.customer.customerId != vars.customerId]">
+				<logger level="DEBUG" doc:name="Log Result" doc:id="a179a925-e91a-4078-804c-47106bb89025" message="Fridge '#[vars.fridgeId]' is not registered for customer '#[vars.customerId]'." category="acme.smartfridges.utils"/>
+				<raise-error doc:name="Raise error" doc:id="5b92bf90-eb28-4d35-a21b-84a3a7d5fb36" type="APP:FRIDGE_NOT_REGISTERED" description="Fridge is not registered for the specified customer."/>
+			</when>
+			<otherwise>
+				<logger level="DEBUG" doc:name="Log Result" doc:id="029b17fd-8093-4011-92d6-332a4ef9285f" message="Fridge '#[vars.fridgeId]' is registered for customer '#[vars.customer]'." category="acme.smartfridges.utils" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

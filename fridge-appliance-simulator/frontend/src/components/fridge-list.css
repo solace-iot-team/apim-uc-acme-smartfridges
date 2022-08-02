@@ -1,0 +1,11 @@
+.fridgelist .p-grid {
+  display: -moz-box;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -0.5rem;
+}
+
+.fridgelist .p-grid .p-dataview-emptymessage {
+  margin: 0.5rem;
+  padding: 0.5rem;
+}

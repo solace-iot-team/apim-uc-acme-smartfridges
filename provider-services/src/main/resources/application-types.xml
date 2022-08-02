@@ -1,0 +1,229 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="applianceTemperatureMeasuredPayload" format="json">
+      <types:shape format="json-schema" location="schemas/applianceTemperatureMeasuredPayload.json"/>
+    </types:type>
+    <types:type name="applicationTemperatureMeasuredPayload" format="json">
+      <types:shape format="json-schema" location="schemas/applicationTemperatureMeasuredPayload.json"/>
+    </types:type>
+    <types:type name="unparsedPayload" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="schemaName" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="MqttAttributes" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: object
+properties:
+    topic:
+        type: string]]></types:shape>
+    </types:type>
+    <types:type name="applianceDoorStatePayload" format="json">
+      <types:shape format="json-schema" location="schemas/applianceDoorStatePayload.json"/>
+    </types:type>
+    <types:type name="applicationDoorStatePayload" format="json">
+      <types:shape format="json-schema" location="schemas/applicationDoorStatePayload.json"/>
+    </types:type>
+    <types:type name="customerId" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: number]]></types:shape>
+    </types:type>
+    <types:type name="fridgeId" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="customer" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: object
+properties:
+    fridgeId:
+        type: string
+    customerId:
+        type: number]]></types:shape>
+    </types:type>
+    <types:type name="applianceTemperatureSettingPayload" format="json">
+      <types:shape format="json-schema" location="schemas/applianceTemperatureSettingPayload.json"/>
+    </types:type>
+    <types:type name="applicationTemperatureSettingPayload" format="json">
+      <types:shape format="json-schema" location="schemas/applicationTemperatureSettingPayload.json"/>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#18dd9371-63dd-4dcf-adb9-d1fd8fe98b92">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="applicationTemperatureMeasuredPayload"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#0785ddfe-123c-45d4-94f6-e744316838aa">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="unparsedPayload"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="applianceTemperatureMeasuredPayload"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#1510ffc5-3ba8-4e1a-aebd-3589270a7a75">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="unparsedPayload"/>
+        </types:message>
+        <types:variables>
+          <types:variable name="schema" type="schemaName"/>
+        </types:variables>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#0cbdb8e3-5c04-4975-9e4b-01533ccd6986">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:variables>
+          <types:variable name="customer" type="customer"/>
+        </types:variables>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#7efc71c5-69e5-45d5-97b8-53141047f208">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:attributes type="MqttAttributes"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:variables>
+          <types:variable name="customerId" type="customerId"/>
+          <types:variable name="fridgeId" type="fridgeId"/>
+        </types:variables>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#5215c8cc-2e9c-4b7d-9f9d-eb3c75a61ba9">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="applianceTemperatureMeasuredPayload"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#56a1d5e3-78e3-41f0-9281-1fd80af017bc">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="applicationTemperatureMeasuredPayload"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#c10f8a44-6c05-488f-a081-edcc0505de58">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="applianceDoorStatePayload"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#5379be86-5f5c-4d02-9c0f-160c0ba36e2e">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="applicationDoorStatePayload"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#f9112ba1-5cf2-4ad3-a39a-eb6d5ce01a45">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="applianceDoorStatePayload"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#2d0a60ff-2519-44db-94c8-22e8edc0ca73">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="applicationDoorStatePayload"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#be85f82f-1015-4cd7-bbd2-c37c570966aa">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="applicationTemperatureSettingPayload"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#471e0b2c-443b-43f1-934c-b7fe2009f04f">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="applicationTemperatureSettingPayload"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="applianceTemperatureSettingPayload"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#2b381402-c5b3-4154-83ef-2d6a49dcc564">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:attributes type="MqttAttributes"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:variables>
+          <types:variable name="customerId" type="customerId"/>
+          <types:variable name="fridgeId" type="fridgeId"/>
+        </types:variables>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#caf6fbdd-fa3e-49be-9b25-afe43cafabbf">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:variables>
+          <types:variable name="customerId" type="customerId"/>
+        </types:variables>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#6b952742-207f-4fde-bf7e-939d1a54e74a">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="applianceTemperatureSettingPayload"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="applicationTemperatureSettingPayload"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

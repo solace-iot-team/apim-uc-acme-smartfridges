@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "description": "Information when a door was opened or closed.",
+  "properties": {
+    "fridgeId": {
+      "type": "string",
+      "description": "ID of the fridge appliance."
+    },
+    "sentAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time when the message was sent."
+    }
+  },
+  "required": [
+    "fridgeId",
+    "sentAt"
+  ]
+}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:mqtt3="http://www.mulesoft.org/schema/mule/mqtt3" xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo" xmlns:solace="http://www.mulesoft.org/schema/mule/solace"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/solace http://www.mulesoft.org/schema/mule/solace/current/mule-solace.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
+http://www.mulesoft.org/schema/mule/mqtt3 http://www.mulesoft.org/schema/mule/mqtt3/current/mule-mqtt3.xsd" >
+	<mqtt3:config name="AsyncAPI_Gateway_MQTT_Connection" doc:name="MQTT3 Config" doc:id="9a0ea236-4a05-483c-ae02-96007bedc260" >
+		<mqtt3:connection username="${mqtt.listener.username}" password="${mqtt.listener.password}" url="${mqtt.listener.host}">
+			<reconnection failsDeployment="true" >
+				<reconnect />
+			</reconnection>
+			<mqtt3:client-id-generator >
+				<mqtt3:client-id-random-suffix-generator clientId="provider-services" />
+			</mqtt3:client-id-generator>
+		</mqtt3:connection>
+	</mqtt3:config>
+	<mongo:config name="Registration_Database_Connection" doc:name="MongoDB Config" doc:id="b824e8d3-e822-482b-847b-cdf65c979c62" >
+		<mongo:connection database="registration">
+			<mongo:server-addresses >
+				<mongo:server-address host="${database.host}" port="${database.port}" />
+			</mongo:server-addresses>
+		</mongo:connection>
+	</mongo:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="d4da0560-e94a-4366-ad32-beb918520d22" file="${env}.yaml" />
+	<global-property doc:name="Global Property" doc:id="827e658f-8f31-4a3d-b493-bd441de75607" name="env" value="local" />
+</mule>

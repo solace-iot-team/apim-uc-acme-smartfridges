@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:mqtt3="http://www.mulesoft.org/schema/mule/mqtt3" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mqtt3 http://www.mulesoft.org/schema/mule/mqtt3/current/mule-mqtt3.xsd">
+	<flow name="proxy-door-closed-event" doc:id="5b565d2b-ee4a-423e-a827-3cf27e620b23" >
+		<mqtt3:listener doc:name="On New Message" doc:id="1abfdf4e-28bf-472c-93d3-87674056c8fb" config-ref="AsyncAPI_Gateway_MQTT_Connection">
+			<reconnect />
+			<mqtt3:topics >
+				<mqtt3:topic topicFilter="acme/smartfridges/appliance/v1/event/+/door/closed" qos="AT_MOST_ONCE" />
+			</mqtt3:topics>
+		</mqtt3:listener>
+		<logger level="DEBUG" doc:name="Log Input" doc:id="8716f9ef-b26d-4c06-8e41-d09b296a794f" message="Received event for topic #[attributes.topic]: #[payload]" category="acme.smartfridges.door.closed"/>
+		<set-variable value="schemas/applianceDoorStatePayload.json" doc:name="Set Schema" doc:id="1997fae7-0dae-41b2-9234-bdc908000996" variableName="schema"/>
+		<flow-ref doc:name="Validate Payload" doc:id="f9112ba1-5cf2-4ad3-a39a-eb6d5ce01a45" name="parse-and-validate-payload"/>
+		<flow-ref doc:name="Check Registration" doc:id="f6e7bad3-eacf-4ec4-a508-366d03c7766e" name="check-registration-for-appliance-topic"/>
+		<set-variable value='#[output application/json&#10;var customerId = vars.customerId as String&#10;var fridgeId = vars.fridgeId as String&#10;---&#10;"acme/smartfridges/application/v1/event/" ++ customerId ++ "/" ++ fridgeId ++ "/door/closed"]' doc:name="Create Topic Destination" doc:id="f82248d9-68c9-4b8f-8e0e-894a74b8a263" variableName="topic" />
+		<ee:transform doc:name="Transform Message" doc:id="2d0a60ff-2519-44db-94c8-22e8edc0ca73">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	customerId: vars.customerId,
+	fridgeId: vars.fridgeId,
+	sentAt: payload.sentAt
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Log Output" doc:id="95f8dd50-2938-4d5a-bc49-f2eafaa56cee" message="Publish event to topic #[vars.topic]: #[payload]" category="acme.smartfridges.door.closed"/>
+		<mqtt3:publish doc:name="Publish" doc:id="6231f0e6-756c-44a2-a1a9-34f8d681e16e" config-ref="AsyncAPI_Gateway_MQTT_Connection" topic="#[vars.topic]" qos="AT_MOST_ONCE" isRetained="true">
+					<reconnect />
+				</mqtt3:publish>
+		<error-handler >
+			<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="1a38b507-9df5-42a4-bed3-6a2c512a0daa" type="APP:INVALID_MESSAGE">
+				<logger level="ERROR" doc:name="Log Error" doc:id="d62bb001-6aa8-4cef-89c2-fc34eec37b01" message='Discarded event for topic #[attributes.topic]: payload is invalid.' category="acme.smartfridges.door.closed"/>
+			</on-error-continue>
+			<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="7ae6bfe3-dcea-4a29-bcee-67a60271783d" type="APP:FRIDGE_NOT_REGISTERED">
+				<logger level="DEBUG" doc:name="Log Message" doc:id="97ac83af-826f-4760-a57b-d63a696b071a" message="Discarded event for topic #[attributes.topic]: fridge is not registered." category="acme.smartfridges.door.closed"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>

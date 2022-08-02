@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:mqtt3="http://www.mulesoft.org/schema/mule/mqtt3" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mqtt3 http://www.mulesoft.org/schema/mule/mqtt3/current/mule-mqtt3.xsd">
+	<flow name="proxy-temperature-setting-updated-event" doc:id="9e68003f-734c-4707-81a9-243be970f0b6">
+		<mqtt3:listener doc:name="On New Message" doc:id="2a0275d6-26c7-4872-bad4-4083dcb22af9" config-ref="AsyncAPI_Gateway_MQTT_Connection">
+			<reconnect />
+			<mqtt3:topics >
+				<mqtt3:topic topicFilter="acme/smartfridges/appliance/v1/event/+/tcu/updated" qos="AT_MOST_ONCE" />
+			</mqtt3:topics>
+		</mqtt3:listener>
+		<logger level="DEBUG" doc:name="Log Input" doc:id="5934c468-67ae-497b-9147-d1ab751445ea" message="Received event for topic #[attributes.topic]: #[payload]" category="acme.smartfridges.tcu.updated"/>
+		<set-variable value="schemas/applianceTemperatureSettingPayload.json" doc:name="Set Schema" doc:id="65b928d7-2f0f-4f55-a97e-9d69a8880b9d" variableName="schema"/>
+		<flow-ref doc:name="Validate Payload" doc:id="dece8740-89f3-4f1b-9725-eb534e349de5" name="parse-and-validate-payload"/>
+		<flow-ref doc:name="Check Registration" doc:id="b250fa62-be95-4d7b-9f03-1cc617f00a33" name="check-registration-for-appliance-topic"/>
+		<set-variable value='#[output application/json&#10;var customerId = vars.customerId as String&#10;var fridgeId = vars.fridgeId as String&#10;---&#10;"acme/smartfridges/application/v1/event/" ++ customerId ++ "/" ++ fridgeId ++ "/tcu/updated"]' doc:name="Create Topic Destination" doc:id="e51e350a-500f-49d8-85e8-c4cb445b6ce7" variableName="topic" />
+		<ee:transform doc:name="Transform Message" doc:id="6b952742-207f-4fde-bf7e-939d1a54e74a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	customerId: vars.customerId,
+	fridgeId: vars.fridgeId,
+	temperature: payload.temperature,
+	sentAt: payload.sentAt
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Log Output" doc:id="2539d8d6-7fa8-476f-a67e-5a3feb5ae7b3" message="Publish event to topic #[vars.topic]: #[payload]" category="acme.smartfridges.tcu.updated"/>
+		<mqtt3:publish doc:name="Publish" doc:id="2485298c-bc8b-44ae-87a0-84fa5d73ae0f" config-ref="AsyncAPI_Gateway_MQTT_Connection" topic="#[vars.topic]" qos="AT_MOST_ONCE" isRetained="true">
+					<reconnect />
+				</mqtt3:publish>
+		<error-handler >
+			<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="0b70e67d-5643-4e23-868f-f2b308930fe6" type="APP:INVALID_MESSAGE">
+				<logger level="ERROR" doc:name="Log Error" doc:id="71f8221b-7658-4559-bca4-49ecf950c69c" message='Discarded event for topic #[attributes.topic]: payload is invalid.' category="acme.smartfridges.tcu.updated"/>
+			</on-error-continue>
+			<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="df56094c-b366-405e-87eb-ccb3e096af28" type="APP:FRIDGE_NOT_REGISTERED">
+				<logger level="DEBUG" doc:name="Log Message" doc:id="9993525a-8fab-4d55-a33f-c1a92f8b7c20" message="Discarded event for topic #[attributes.topic]: fridge is not registered." category="acme.smartfridges.tcu.updated"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>

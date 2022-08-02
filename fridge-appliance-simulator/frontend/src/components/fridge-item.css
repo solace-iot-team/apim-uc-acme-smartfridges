@@ -1,0 +1,70 @@
+.fridge-item {
+  background-color: var(--surface-ground);
+  margin: 0.5em;
+  border: 1px solid var(--surface-border);
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+
+.fridge-item-top,
+.fridge-item-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fridge-item-content {
+  margin: 1rem 0;
+  min-height: 5rem;
+}
+
+.fridge-item .id {
+  font-size: 0.8rem;
+}
+
+.fridge-item .name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5em;
+}
+
+.fridge-item .description {
+  margin: 0 0 1rem 0;
+}
+
+.fridge-item .temperature-icon {
+  vertical-align: middle;
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.fridge-item .temperature {
+  vertical-align: middle;
+  border: 1px solid #b3e5fc;
+  border-radius: 2px;
+  padding: 0 4px;
+  margin: 0 2px;
+}
+
+.fridge-item .temperature.active {
+  background-color: #b3e5fc;
+}
+
+.fridge-item .door-status-badge {
+  border-radius: 2px;
+  padding: 0.25em 0.5rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: .3px;
+}
+
+.fridge-item .door-status-badge.status-open {
+  background: #feedaf;
+  color: #8a5340;
+}
+
+.fridge-item .door-status-badge.status-closed {
+  background-color: #c8e6c9;
+  color: #256029;
+}

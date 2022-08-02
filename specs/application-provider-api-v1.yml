@@ -1,0 +1,185 @@
+asyncapi: 2.4.0
+id: urn:com:acme:smartfridges:application:provider
+info:
+  title: Application Provider API
+  version: 1.1.0
+  description: |
+    The Application Provider API allows the Configuration and Monitoring API service provider to send fridge sensor and state information to the server and to receive fridge configuration commands from the server.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/mit-license.php
+
+servers: {}
+
+defaultContentType: application/json
+
+channels:
+
+  acme/smartfridges/application/v1/event/{customerId}/{fridgeId}/temperature/measured:
+    parameters:
+      customerId:
+        $ref: '#/components/parameters/customerId'
+      fridgeId:
+        $ref: '#/components/parameters/fridgeId'
+    subscribe:
+      summary: Inform about the measured temperature of a particular fridge.
+      message:
+        $ref: '#/components/messages/applicationTemperatureMeasured'
+
+  acme/smartfridges/application/v1/event/{customerId}/{fridgeId}/door/opened:
+    parameters:
+      customerId:
+        $ref: '#/components/parameters/customerId'
+      fridgeId:
+        $ref: '#/components/parameters/fridgeId'
+    subscribe:
+      summary: Inform when the door of a particular fridge was opened.
+      message:
+        $ref: '#/components/messages/applicationDoorOpened'
+
+  acme/smartfridges/application/v1/event/{customerId}/{fridgeId}/door/closed:
+    parameters:
+      customerId:
+        $ref: '#/components/parameters/customerId'
+      fridgeId:
+        $ref: '#/components/parameters/fridgeId'
+    subscribe:
+      summary: Inform when the door of a particular fridge was closed.
+      message:
+        $ref: '#/components/messages/applicationDoorClosed'
+
+  acme/smartfridges/application/v1/action/{customerId}/{fridgeId}/tcu/update:
+    parameters:
+      customerId:
+        $ref: '#/components/parameters/customerId'
+      fridgeId:
+        $ref: '#/components/parameters/fridgeId'
+    publish:
+      summary: Receive information to update the temperature setting of a particular fridge.
+      message:
+        $ref: '#/components/messages/applicationUpdateTemperatureSetting'
+
+  acme/smartfridges/application/v1/event/{customerId}/{fridgeId}/tcu/updated:
+    parameters:
+      customerId:
+        $ref: '#/components/parameters/customerId'
+      fridgeId:
+        $ref: '#/components/parameters/fridgeId'
+    subscribe:
+      summary: Inform when the temperature setting of a particular fridge was updated.
+      message:
+        $ref: '#/components/messages/applicationTemperatureSettingUpdated'
+
+components:
+
+  schemas:
+    applicationTemperatureMeasuredPayload:
+      type: object
+      description: Information about the measured temperature.
+      properties:
+        customerId:
+          $ref: '#/components/schemas/customerId'
+        fridgeId:
+          $ref: '#/components/schemas/fridgeId'
+        temperature:
+          $ref: '#/components/schemas/temperature'
+        sentAt:
+          $ref: '#/components/schemas/sentAt'
+      required: ['customerId', 'fridgeId', 'temperature', 'sentAt']
+    applicationDoorOpenedClosedPayload:
+      type: object
+      description: Information when a door was opened or closed.
+      properties:
+        customerId:
+          $ref: '#/components/schemas/customerId'
+        fridgeId:
+          $ref: '#/components/schemas/fridgeId'
+        sentAt:
+          $ref: '#/components/schemas/sentAt'
+      required: ['customerId', 'fridgeId', 'sentAt']
+    applicationTemperatureSettingPayload:
+      type: object
+      description: Information about the temperature setting.
+      properties:
+        customerId:
+          $ref: '#/components/schemas/customerId'
+        fridgeId:
+          $ref: '#/components/schemas/fridgeId'
+        temperature:
+          $ref: '#/components/schemas/temperatureSetting'
+        sentAt:
+          $ref: '#/components/schemas/sentAt'
+      required: ['customerId', 'fridgeId', 'temperature', 'sentAt']
+    customerId:
+      type: number
+      description: ID of the customer.
+    fridgeId:
+      type: string
+      description: ID of the fridge.
+    temperature:
+      type: object
+      description: Temperature information.
+      properties:
+        value:
+          type: number
+          description: Temperature value.
+        unit:
+          type: string
+          enum:
+            - C
+            - F
+          description: Temperature unit (Celsius or Fahrenheit).
+      additionalProperties: false
+      required: ['value', 'unit']
+    temperatureSetting:
+      type: number
+      description: Temperature setting.
+    sentAt:
+      type: string
+      format: date-time
+      description: Date and time when the message was sent.
+
+  messages:
+    applicationTemperatureMeasured:
+      name: Application_TemperatureMeasured
+      title: Temperature measured
+      summary: Inform about the temperature of a particular fridge.
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/applicationTemperatureMeasuredPayload'
+    applicationDoorOpened:
+      name: Application_DoorOpened
+      title: Door opened
+      summary: Inform when the door of a particular fridge was opened.
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/applicationDoorOpenedClosedPayload'
+    applicationDoorClosed:
+      name: Application_DoorClosed
+      title: Door closed
+      summary: Inform when the door of a particular fridge was closed.
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/applicationDoorOpenedClosedPayload'
+    applicationUpdateTemperatureSetting:
+      name: Application_UpdateTemperatureSetting
+      title: Update temperature setting
+      summary: Update the temperature setting of a particular fridge.
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/applicationTemperatureSettingPayload'
+    applicationTemperatureSettingUpdated:
+      name: Application_TemperatureSettingUpdated
+      title: Temperature setting updated
+      summary: Inform when the temperature setting of a particular fridge was updated.
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/applicationTemperatureSettingPayload'
+
+  parameters:
+    customerId:
+      schema:
+        $ref: '#/components/schemas/customerId'
+    fridgeId:
+      schema:
+        $ref: '#/components/schemas/fridgeId'
