@@ -69,9 +69,10 @@ class FridgeSimulator {
     return new Promise((resolve, reject) => {
 
       const client = mqtt.connect(config.broker.endpoint, {
-        clientId: fridge.id,
+        clientId: `fridge-appliance-${fridge.id}`,
         username: config.broker.username,
         password: config.broker.password,
+        reconnectPeriod: 2000,
       });
       client.once('connect', () => {
         client.subscribe(`${topicRoot}/action/${fridge.id}/tcu/update`, { qos: 0 }, (error) => {
@@ -81,6 +82,10 @@ class FridgeSimulator {
       });
       client.once('error', (error) => {
         reject(error.message);
+      });
+      client.on('offline', () => {
+        // avoid an endless loop when a published message is rejected by the event broker
+        client.removeOutgoingMessage(client.getLastMessageId());
       });
       client.on('message', (topic, message) => {
         const data = JSON.parse(message.toString());

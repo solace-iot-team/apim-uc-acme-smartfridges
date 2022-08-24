@@ -24,15 +24,26 @@ class FridgesService {
       } else {
 
         const client = mqtt.connect(config.broker.endpoint, {
-          clientId: clientId,
+          clientId: `consumer-app-${clientId}`,
           username: config.broker.username,
           password: config.broker.password,
+          reconnectPeriod: 2000,
         });
 
         client.once('connect', () => {
           this.#clients[clientId] = client;
           resolve(this.#clients[clientId]);
           console.log(`Client ${clientId} connected`);
+        });
+
+        client.on('offline', () => {
+          // avoid endless loop when a published message is rejected by the event broker
+          client.removeOutgoingMessage(client.getLastMessageId());
+          console.log(`Client ${clientId} is offline`);
+        });
+
+        client.on('reconnect', () => {
+          console.log(`Client ${clientId} reconnected`);
         });
 
         client.once('error', (error) => {
@@ -56,7 +67,7 @@ class FridgesService {
         sentAt: new Date().toISOString(),
       };
 
-      client.publish(topic, JSON.stringify(message), (error) => {
+      client.publish(topic, JSON.stringify(message), { qos: 1 }, (error) => {
         if (error) {
           reject(error.message);
         } else {
