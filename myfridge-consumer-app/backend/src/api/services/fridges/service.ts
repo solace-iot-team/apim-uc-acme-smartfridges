@@ -38,7 +38,7 @@ class FridgesService {
 
         client.on('offline', () => {
           // avoid endless loop when a published message is rejected by the event broker
-          client.removeOutgoingMessage(client.getLastMessageId());
+          try { client.removeOutgoingMessage(client.getLastMessageId()); } catch (all) { /* ignore */ }
           console.log(`Client ${clientId} is offline`);
         });
 
@@ -67,7 +67,7 @@ class FridgesService {
         sentAt: new Date().toISOString(),
       };
 
-      client.publish(topic, JSON.stringify(message), { qos: 1 }, (error) => {
+      client.publish(topic, JSON.stringify(message), { qos: 1, cbStorePut: () => {}}, (error) => {
         if (error) {
           reject(error.message);
         } else {
