@@ -14,6 +14,7 @@ servers: {}
 channels:
 
   acme/smartfridges/appliance/v1/event/{fridgeId}/temperature/measured:
+    x-ep-event-name: Appliance_TemperatureMeasured
     parameters:
       fridgeId:
         $ref: '#/components/parameters/fridgeId'
@@ -23,6 +24,7 @@ channels:
         $ref: '#/components/messages/applianceTemperatureMeasured'
 
   acme/smartfridges/appliance/v1/event/{fridgeId}/door/opened:
+    x-ep-event-name: Appliance_DoorOpened
     parameters:
       fridgeId:
         $ref: '#/components/parameters/fridgeId'
@@ -32,6 +34,7 @@ channels:
         $ref: '#/components/messages/applianceDoorOpened'
 
   acme/smartfridges/appliance/v1/event/{fridgeId}/door/closed:
+    x-ep-event-name: Appliance_DoorClosed
     parameters:
       fridgeId:
         $ref: '#/components/parameters/fridgeId'
@@ -41,6 +44,7 @@ channels:
         $ref: '#/components/messages/applianceDoorClosed'
 
   acme/smartfridges/appliance/v1/action/{fridgeId}/tcu/update:
+    x-ep-event-name: Appliance_UpdateTemperatureSetting
     parameters:
       fridgeId:
         $ref: '#/components/parameters/fridgeId'
@@ -50,6 +54,7 @@ channels:
         $ref: '#/components/messages/applianceUpdateTemperatureSetting'
 
   acme/smartfridges/appliance/v1/event/{fridgeId}/tcu/updated:
+    x-ep-event-name: Appliance_TemperatureSettingUpdated
     parameters:
       fridgeId:
         $ref: '#/components/parameters/fridgeId'

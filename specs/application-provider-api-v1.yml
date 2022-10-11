@@ -16,6 +16,7 @@ defaultContentType: application/json
 channels:
 
   acme/smartfridges/application/v1/event/{customerId}/{fridgeId}/temperature/measured:
+    x-ep-event-name: Application_TemperatureMeasured
     parameters:
       customerId:
         $ref: '#/components/parameters/customerId'
@@ -27,6 +28,7 @@ channels:
         $ref: '#/components/messages/applicationTemperatureMeasured'
 
   acme/smartfridges/application/v1/event/{customerId}/{fridgeId}/door/opened:
+    x-ep-event-name: Application_DoorOpened
     parameters:
       customerId:
         $ref: '#/components/parameters/customerId'
@@ -38,6 +40,7 @@ channels:
         $ref: '#/components/messages/applicationDoorOpened'
 
   acme/smartfridges/application/v1/event/{customerId}/{fridgeId}/door/closed:
+    x-ep-event-name: Application_DoorClosed
     parameters:
       customerId:
         $ref: '#/components/parameters/customerId'
@@ -49,6 +52,7 @@ channels:
         $ref: '#/components/messages/applicationDoorClosed'
 
   acme/smartfridges/application/v1/action/{customerId}/{fridgeId}/tcu/update:
+    x-ep-event-name: Application_UpdateTemperatureSetting
     parameters:
       customerId:
         $ref: '#/components/parameters/customerId'
@@ -60,6 +64,7 @@ channels:
         $ref: '#/components/messages/applicationUpdateTemperatureSetting'
 
   acme/smartfridges/application/v1/event/{customerId}/{fridgeId}/tcu/updated:
+    x-ep-event-name: Application_TemperatureSettingUpdated
     parameters:
       customerId:
         $ref: '#/components/parameters/customerId'
